@@ -1,14 +1,14 @@
 <?
 	require 'CloudFront.php';
-	
+
 	// your AWS/CloudFront keys go here
-	$keyId          = ""; 
+	$keyId          = "";
 	$secretKey      = "";
 	$distributionId = "";
-	
-	$key = ""; // String representing the existing CloudFront object to invalidate
-	
-	$cf  = new CloudFront($keyId, $secretKey, $distributionId);
+
+	$key = ""; // String representing the existing CloudFront object to invalidate, no leading slash
+
+	$cf  = new CloudFront($keyId, $secretKey, $distributionId); // cloudfront distribution id for S3 bucket, not the bucket name
 ?>
 <html>
 <head>
@@ -18,10 +18,12 @@
 	Key: <?=$key?><br/>
 	<hr/>
 	CF call:<br/>
-	<?/* 
-	 	Passing "true" to enable debugging for the purpose of this example. 
-		This will render the XML response.
-	*/?>
-	<textarea><?=$cf->invalidate($key, true)?></textarea>
+	<textarea>
+	<?
+	if (!$cf->invalidate($key) ) {
+		echo $cf->debug();
+	}
+	?>
+	</textarea>
 </body>
 </html>
