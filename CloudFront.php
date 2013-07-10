@@ -7,6 +7,7 @@
  * https://github.com/subchild/CloudFront-PHP-Invalidator
  *
  * codebynumbers - Remove dependencies by replacing PEAR/Http_request with Curl
+ * RobFerrer - fixed the debug functionality to bring it in line with the master branch
  */
 
 class CloudFront {
@@ -38,7 +39,7 @@ class CloudFront {
 	 * Invalidates object with passed key on CloudFront
 	 * @param $key 	{String|Array} Key of object to be invalidated, or set of such keys
 	 */
-	public function invalidate($keys){
+	public function invalidate($keys, $debug=false){
 		if (!is_array($keys)){
 			$keys = array($keys);
 		}
@@ -74,19 +75,23 @@ class CloudFront {
 		$this->responseBody = curl_exec($cURL_Session);
 		$this->responseCode = curl_getinfo($cURL_Session, CURLINFO_HTTP_CODE);
 
-		$er = array();
-		array_push($er, "CloudFront: Invalidating Object: $key");
-		array_push($er, $requestUrl);
-		array_push($er, "body: $body");
-		array_push($er, "response: $response");
-		array_push($er, "response string: " . $this->responseBody);
-		array_push($er, "");
-		array_push($er, "response code: " . $this->responseCode);
-		array_push($er, "");
-		$this->debug = implode("\n",$er);
-
-		return ($this->responseCode === 201);
-
+		if ($debug==true){
+			$er = array();
+			array_push($er, "CloudFront: Invalidating Object: $key");
+			array_push($er, $requestUrl);
+			array_push($er, "body: $body");
+			array_push($er, "response: $this->responseBody");
+			array_push($er, "");
+			array_push($er, "response code: " . $this->responseCode);
+			array_push($er, "");
+			$this->debug = implode("\n",$er);
+			
+			return $this->debug;
+		}
+		else
+		{
+			return ($this->responseCode === 201);
+		}
 	}
 
 
